@@ -1,0 +1,82 @@
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions, status, viewsets
+
+from django_filters.rest_framework import DjangoFilterBackend
+from .permissions import IsAuthorOrAdmin
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .filters import IngredientsFilter, RecipeFilter
+from recipes.models import Ingredient, Recipe, Tag, Favorite, ShoppingCart
+from .serializers import (IngedientSerializer, RecipeSerializer, TagSerializer,
+                          AddRecipeSerializer, FavouriteSerializer,
+                          ShoppingCartSerializer)
+from .pagination import ResultsSetPagination
+from .download import download_file_response, get_ingredients_list
+
+
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngedientSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IngredientsFilter
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    permission_classes = [IsAuthorOrAdmin]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = RecipeFilter
+    pagination_class = ResultsSetPagination
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RecipeSerializer
+        return AddRecipeSerializer
+
+    @action(permission_classes=[IsAuthorOrAdmin], detail=True)
+    def favorite(self, request, pk):
+        data = {'user': request.user.id, 'recipe': pk}
+        serializer = FavouriteSerializer(
+            data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @favorite.mapping.delete
+    def delete_favorite(self, request, pk):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
+        favorite.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, permission_classes=[IsAuthorOrAdmin])
+    def shopping_cart(self, request, pk):
+        data = {'user': request.user.id, 'recipe': pk}
+        serializer = ShoppingCartSerializer(
+            data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        shopping_cart = get_object_or_404(
+            ShoppingCart, user=user, recipe=recipe)
+        shopping_cart.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, permission_classes=[permissions.IsAuthenticated])
+    def download_shopping_cart(self, request):
+        to_buy = get_ingredients_list(request)
+        return download_file_response(to_buy, 'to_buy.txt')

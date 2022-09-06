@@ -3,7 +3,7 @@ from django.urls import include, path
 
 api_patterns = [
     path('', include('users.urls')),
-    path('', include('api.urls')),  # ! tyt
+    path('', include('api.urls')),
 ]
 urlpatterns = [
     path('admin/', admin.site.urls),

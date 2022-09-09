@@ -29,9 +29,8 @@ class MyUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
-
-def __str__(self):
-    return self.email
+    def __str__(self):
+        return self.email
 
 
 class Follow(models.Model):
@@ -47,3 +46,7 @@ class Follow(models.Model):
                        name='unique_following')]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+    
+    def __str__(self):
+        return self.user
+        

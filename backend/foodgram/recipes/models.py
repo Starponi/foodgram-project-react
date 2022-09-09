@@ -8,7 +8,7 @@ User = get_user_model()
 class Tag(models.Model):
     name = models.CharField(
         verbose_name='Тег',
-        max_length=200,
+        max_length=20,
         unique=True,
     )
     color = models.CharField(
@@ -18,7 +18,7 @@ class Tag(models.Model):
     )
     slug = models.SlugField(
         verbose_name='Слаг',
-        max_length=200,
+        max_length=20,
         unique=True,
     )
 
@@ -34,11 +34,11 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(
         verbose_name='Ингредиент',
-        max_length=200,
+        max_length=20,
     )
     measurement_unit = models.CharField(
         verbose_name='Единица измерения',
-        max_length=200,
+        max_length=20,
     )
 
     class Meta:
@@ -69,7 +69,7 @@ class Recipe(models.Model):
         verbose_name='Описание блюда',
         help_text='Добавьте описание блюда',
     )
-    Ingredients = models.ManyToManyField(
+    ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингрединты блюда',
         through='AmountIngredient',
@@ -84,10 +84,10 @@ class Recipe(models.Model):
         default=0,
         validators=(
             MinValueValidator(
-                1, 'Блюдо готово!'
+                1, 'Время должно быть больше 1 минуты!'
             ),
             MaxValueValidator(
-                600, 'Стоит еще подождать'
+                600, 'Слишком большое время приготовления!'
             ),
         ),
     )
@@ -120,7 +120,7 @@ class AmountIngredient(models.Model):
         default=0,
         validators=(
             MinValueValidator(
-                1, 'Нужно несколько ингредиентов!'
+                0.1, 'Нужно несколько ингредиентов!'
             ),
             MaxValueValidator(
                 600, 'Слишком много!'
@@ -138,6 +138,9 @@ class AmountIngredient(models.Model):
             ),
         )
 
+    def __str__(self):
+        return self.amount
+
 
 class RecipeTag(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
@@ -154,7 +157,7 @@ class RecipeTag(models.Model):
         )
 
     def __str___(self):
-        return 'Тег рецепта'
+        return f'{self.tag} {self.recipe}'
 
 
 class Favorite(models.Model):
@@ -182,6 +185,9 @@ class Favorite(models.Model):
             ),
         )
 
+    def __str__(self):
+        return self.recipe
+
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(
@@ -207,3 +213,6 @@ class ShoppingCart(models.Model):
                 name='unique_recipe_in_user_shopping_cart'
             ),
         )
+
+    def __str__(self):
+        return self.user

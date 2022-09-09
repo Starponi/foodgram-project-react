@@ -1,17 +1,20 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status, viewsets
 
 from django_filters.rest_framework import DjangoFilterBackend
-from .permissions import IsAuthorOrAdmin
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from .filters import IngredientsFilter, RecipeFilter
-from recipes.models import Ingredient, Recipe, Tag, Favorite, ShoppingCart
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from .pagination import ResultsSetPagination
+from .permissions import IsAuthorOrAdmin
 from .serializers import (IngedientSerializer, RecipeSerializer, TagSerializer,
                           AddRecipeSerializer, FavouriteSerializer,
                           ShoppingCartSerializer)
-from .pagination import ResultsSetPagination
 from .download import download_file_response, get_ingredients_list
+
+from foodgram.settings import TO_BUY
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,42 +44,43 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return AddRecipeSerializer
 
-    @action(permission_classes=[IsAuthorOrAdmin], detail=True)
-    def favorite(self, request, pk):
+    @staticmethod
+    def post_method_for_actions(request, pk, serializers):
         data = {'user': request.user.id, 'recipe': pk}
-        serializer = FavouriteSerializer(
-            data=data, context={'request': request})
+        serializer = serializers(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @staticmethod
+    def delete_method_for_actions(request, pk, model):
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+        model_obj = get_object_or_404(model, user=user, recipe=recipe)
+        model_obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(permission_classes=[IsAuthorOrAdmin], detail=True)
+    def favorite(self, request, pk):
+        return self.post_method_for_actions(
+            request=request, pk=pk, serializers=FavouriteSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=pk)
-        favorite = get_object_or_404(Favorite, user=user, recipe=recipe)
-        favorite.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.delete_method_for_actions(
+            request=request, pk=pk, model=Favorite)
 
     @action(detail=True, permission_classes=[IsAuthorOrAdmin])
     def shopping_cart(self, request, pk):
-        data = {'user': request.user.id, 'recipe': pk}
-        serializer = ShoppingCartSerializer(
-            data=data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return self.post_method_for_actions(
+            request=request, pk=pk, serializers=ShoppingCartSerializer)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk):
-        user = request.user
-        recipe = get_object_or_404(Recipe, id=pk)
-        shopping_cart = get_object_or_404(
-            ShoppingCart, user=user, recipe=recipe)
-        shopping_cart.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.delete_method_for_actions(
+            request=request, pk=pk, model=ShoppingCart)
 
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         to_buy = get_ingredients_list(request)
-        return download_file_response(to_buy, 'to_buy.txt')
+        return download_file_response(to_buy, TO_BUY)

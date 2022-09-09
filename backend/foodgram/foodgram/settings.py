@@ -1,22 +1,15 @@
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SECRET_KEY = os.getenv('SECRET_KEY', default=' ')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8a*0+!v2nc6s(o#9@-ix=04ubk!d5-)mql+%asextyu!i6e+09'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 # ALLOWED_HOSTS = ['backend', 'localhost', '127.0.0.1']
 ALLOWED_HOSTS = ['backend', 'localhost', '127.0.0.1', 'db']
 
-# Application definition
+TO_BUY = 'to_buy.txt'
 
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
@@ -29,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'rest_framework.authtoken',
     'django_filters',
     'djoser',
@@ -38,6 +32,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -45,7 +40,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/.*$'
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
+
 ROOT_URLCONF = 'foodgram.urls'
+# ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
@@ -64,10 +66,8 @@ TEMPLATES = [
 ]
 
 # WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -88,9 +88,16 @@ DATABASES = {
 #     }
 # }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'db',
+#         'PORT': '5432'
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -108,9 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'GMT'
@@ -122,11 +126,10 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+# STATIC_URL = '/backend_static/'
+STATIC_URL = '/static/'
 
-STATIC_URL = '/backend_static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'backend_static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/backend_media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'backend_media')

@@ -3,7 +3,7 @@ from django.http.response import HttpResponse
 from recipes.models import AmountIngredient
 
 
-def get_ingredients_list(request):
+def get_ingredients_list():
     ingredients_dict = {}
     ingredients = AmountIngredient.objects.values(
         'amount',

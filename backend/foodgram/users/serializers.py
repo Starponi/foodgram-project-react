@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
-
-from recipes.models import Recipe
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
+from djoser.serializers import UserCreateSerializer, UserSerializer
 
 from .models import Follow
+from recipes.models import Recipe
 
 User = get_user_model()
 
@@ -79,14 +78,11 @@ class ShowFollowSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get('request')
+        recipes = obj.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
-        if recipes_limit is not None:
-            recipes = obj.recipes.all()[:(int(recipes_limit))]
-        else:
-            recipes = obj.recipes.all()
-        context = {'request': request}
-        return FollowingRecipesSerializers(recipes, many=True,
-                                           context=context).data
+        if recipes_limit:
+            recipes = recipes[:(int(recipes_limit))]
+        return FollowingRecipesSerializers(recipes, many=True).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()

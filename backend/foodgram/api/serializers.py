@@ -3,11 +3,9 @@ from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-
-from users.serializers import CustomUserSerializer
 from recipes.models import (AmountIngredient, Favorite, Ingredient, Recipe,
                             ShoppingCart, Tag)
-
+from users.serializers import CustomUserSerializer
 
 User = get_user_model()
 
@@ -98,7 +96,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients', 'name',
                   'image', 'text', 'cooking_time')
 
-    def validate_ingredients(self, data):
+    def __validate_ingredients(self, data):
         ingredients = self.initial_data.get('ingredients')
         if not ingredients:
             raise ValidationError(
@@ -114,7 +112,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
             raise ValidationError('Время готовки не может быть 0')
         return data
 
-    def add_recipe_ingredients(self, ingredients, recipe):
+    def add_recipe_ingredients(ingredients, recipe):
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
             amount = ingredient['amount']
@@ -154,13 +152,13 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         recipe.save()
         return recipe
 
-    def to_representation(self, recipe):
+    def representation(self, recipe):
         data = ShortRecipeSerializer(
             recipe, context={'request': self.context.get('request')}).data
         return data
 
 
-class FavouriteSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
@@ -198,6 +196,6 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        request = self.contest.get('request')
+        request = self.context.get('request')
         context = {'request': request}
         return ShortRecipeSerializer(instance.recipe, context=context).data

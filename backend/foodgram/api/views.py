@@ -1,20 +1,19 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .filters import IngredientsFilter, RecipeFilter
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+
+from .filters import IngredientsFilter, RecipeFilter
 from .pagination import ResultsSetPagination
 from .permissions import IsAuthorOrAdmin
-from .serializers import (IngedientSerializer, RecipeSerializer, TagSerializer,
-                          AddRecipeSerializer, FavouriteSerializer,
-                          ShoppingCartSerializer)
-from .download import download_file_response, get_ingredients_list
-
-from foodgram.settings import TO_BUY
+from .serializers import (AddRecipeSerializer, FavoriteSerializer,
+                          IngedientSerializer, RecipeSerializer,
+                          ShoppingCartSerializer, TagSerializer)
+from .utils import download_file_response, get_ingredients_list
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -45,7 +44,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return AddRecipeSerializer
 
     @staticmethod
-    def post_method_for_actions(request, pk, serializers):
+    def __post_method_for_actions(request, pk, serializers):
         data = {'user': request.user.id, 'recipe': pk}
         serializer = serializers(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -53,7 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
-    def delete_method_for_actions(request, pk, model):
+    def __delete_method_for_actions(request, pk, model):
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
         model_obj = get_object_or_404(model, user=user, recipe=recipe)
@@ -63,7 +62,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(permission_classes=[IsAuthorOrAdmin], detail=True)
     def favorite(self, request, pk):
         return self.post_method_for_actions(
-            request=request, pk=pk, serializers=FavouriteSerializer)
+            request=request, pk=pk, serializers=FavoriteSerializer)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk):
@@ -83,4 +82,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
         to_buy = get_ingredients_list(request)
-        return download_file_response(to_buy, TO_BUY)
+        return download_file_response(
+            to_buy, settings.INGREDIENTS_LIST_FILENAME)

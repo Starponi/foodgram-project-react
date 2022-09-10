@@ -84,7 +84,7 @@ class Recipe(models.Model):
         default=0,
         validators=(
             MinValueValidator(
-                1, 'Время должно быть больше 1 минуты!'
+                1, 'Время должно быть хотя бы 1 минута!'
             ),
             MaxValueValidator(
                 600, 'Слишком большое время приготовления!'
@@ -102,7 +102,7 @@ class Recipe(models.Model):
 
 
 class AmountIngredient(models.Model):
-    ingredients = models.ForeignKey(
+    ingredient = models.ForeignKey(
         Ingredient,
         verbose_name='Используемые ингредиенты',
         related_name='ingredient',
@@ -138,8 +138,8 @@ class AmountIngredient(models.Model):
             ),
         )
 
-    def __str__(self):
-        return self.amount
+    def __str___(self):
+        return f'{self.ingredient} {self.recipe}'
 
 
 class RecipeTag(models.Model):
@@ -185,8 +185,8 @@ class Favorite(models.Model):
             ),
         )
 
-    def __str__(self):
-        return self.recipe
+    def __str___(self):
+        return f'{self.user} {self.recipe}'
 
 
 class ShoppingCart(models.Model):
@@ -214,5 +214,5 @@ class ShoppingCart(models.Model):
             ),
         )
 
-    def __str__(self):
-        return self.user
+    def __str___(self):
+        return f'{self.user} {self.recipe}'

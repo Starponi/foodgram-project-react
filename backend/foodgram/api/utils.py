@@ -3,8 +3,6 @@ from django.http.response import HttpResponse
 
 from recipes.models import AmountIngredient
 
-from .serializers import ShortRecipeSerializer
-
 
 def get_ingredients_list(request):
     ingredients = AmountIngredient.objects.filter(
@@ -30,9 +28,3 @@ def download_file_response(list_to_download, filename):
     response = HttpResponse(list_to_download, 'Content-Type: text/plain')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return
-
-
-def to_representation(self, instance):
-    request = self.context.get('request')
-    context = {'request': request}
-    return ShortRecipeSerializer(instance.recipe, context=context).data

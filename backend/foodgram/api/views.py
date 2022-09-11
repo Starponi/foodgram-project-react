@@ -6,13 +6,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
-
 from .filters import IngredientsFilter, RecipeFilter
 from .pagination import ResultsSetPagination
 from .permissions import IsAuthorOrAdmin
-from .serializers import (AddRecipeSerializer, FavoriteSerializer,
-                          IngedientSerializer, RecipeSerializer,
-                          ShoppingCartSerializer, TagSerializer)
+from .serializers import (
+    AddRecipeSerializer, FavoriteSerializer, IngedientSerializer,
+    RecipeSerializer, ShoppingCartSerializer, TagSerializer
+)
 from .utils import download_file_response, get_ingredients_list
 
 

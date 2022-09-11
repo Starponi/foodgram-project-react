@@ -3,9 +3,13 @@ from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from recipes.models import (AmountIngredient, Favorite, Ingredient, Recipe,
-                            ShoppingCart, Tag)
+
+from recipes.models import (
+    AmountIngredient, Favorite, Ingredient, Recipe, ShoppingCart, Tag
+)
 from users.serializers import CustomUserSerializer
+
+from .mixin import MyMixin
 
 User = get_user_model()
 
@@ -112,7 +116,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
             raise ValidationError('Время готовки не может быть 0')
         return data
 
-    def add_recipe_ingredients(ingredients, recipe):
+    def __add_recipe_ingredients(ingredients, recipe):
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
             amount = ingredient['amount']
@@ -158,44 +162,25 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         return data
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(MyMixin, serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    model_def = Favorite
+    serializer_def = ShortRecipeSerializer
+    text_error = 'Рецепт уже добавлен!'
 
     class Meta:
         model = Favorite
         fields = ('user', 'recipe')
 
-    def validate(self, data):
-        user = data['user']
-        recipe_id = data['recipe'].id
-        if Favorite.objects.filter(user=user, recipe__id=recipe_id).exists():
-            raise ValidationError('Рецепт уже добавлен!')
-        return data
 
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return ShortRecipeSerializer(instance.recipe, context=context).data
-
-
-class ShoppingCartSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(MyMixin, serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    model_def = ShoppingCart
+    serializer_def = ShortRecipeSerializer
+    text_error = 'Рецепт уже добавлен в список покупок!'
 
     class Meta:
         model = ShoppingCart
         fields = ('user', 'recipe')
-
-    def validate(self, data):
-        user = data['user']
-        recipe_id = data['recipe'].id
-        if ShoppingCart.objects.filter(
-                user=user, recipe__id=recipe_id).exists():
-            raise ValidationError('Рецепт уже добавлен в список покупок!')
-        return data
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return ShortRecipeSerializer(instance.recipe, context=context).data

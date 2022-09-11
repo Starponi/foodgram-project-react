@@ -34,3 +34,20 @@ python manage.py migrate
 ```bash
 python manage.py runserver
 ```
+## Запуск проекта в Docker контейнере
+Запустите docker compose:
+```bash
+docker-compose up -d --build
+```
+Примените миграции:
+```bash
+docker-compose exec backend python manage.py migrate
+```
+Создайте администратора
+```bash
+docker-compose exec backend python manage.py createsuperuser
+```
+Соберите статику:
+```bash
+docker-compose exec backend python manage.py collectstatic --noinput
+```

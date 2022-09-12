@@ -29,7 +29,7 @@ services:
       - db
 
   nginx:
-    image: nginx:1.19.3
+    image: nginx:1.21.3-alpine
     ports:
       - 8001:8001
     volumes:

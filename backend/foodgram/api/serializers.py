@@ -8,8 +8,7 @@ from recipes.models import (
     AmountIngredient, Favorite, Ingredient, Recipe, ShoppingCart, Tag
 )
 from users.serializers import CustomUserSerializer
-
-from .mixin import MyMixin
+from .mixins import RecipeMixin
 
 User = get_user_model()
 
@@ -162,24 +161,24 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         return data
 
 
-class FavoriteSerializer(MyMixin, serializers.ModelSerializer):
+class FavoriteSerializer(RecipeMixin, serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     model_def = Favorite
     serializer_def = ShortRecipeSerializer
-    text_error = 'Рецепт уже добавлен!'
+    ValidationError = 'Рецепт уже добавлен!'
 
     class Meta:
         model = Favorite
         fields = ('user', 'recipe')
 
 
-class ShoppingCartSerializer(MyMixin, serializers.ModelSerializer):
+class ShoppingCartSerializer(RecipeMixin, serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     model_def = ShoppingCart
     serializer_def = ShortRecipeSerializer
-    text_error = 'Рецепт уже добавлен в список покупок!'
+    ValidationError = 'Рецепт уже добавлен в список покупок!'
 
     class Meta:
         model = ShoppingCart

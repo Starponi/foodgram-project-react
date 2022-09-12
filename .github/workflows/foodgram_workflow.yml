@@ -45,7 +45,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          context: ./backend/
+          context: ./backend/foodgram/
           file: ./backend/foodgram/Dockerfile
           tags: chistovsergeivadimovich/foodgram:latest
       - name: Push to Docker Hub

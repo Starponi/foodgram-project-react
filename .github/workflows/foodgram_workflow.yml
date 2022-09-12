@@ -47,14 +47,14 @@ jobs:
           push: true
           context: ./backend/foodgram/
           file: ./backend/foodgram/Dockerfile
-          tags: shanik92/foodgram:latest
+          tags: shanik92/foodgram:v1.0
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
           push: true
           context: ./backend/foodgram/
           file: ./backend/foodgram/Dockerfile
-          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:v1.0
 
   deploy:
     runs-on: ubuntu-latest
@@ -70,7 +70,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           stack_file_name: docker-compose.yml
           script: |
-            sudo docker pull shanik-92/foodgram:latest
+            sudo docker pull shanik-92/foodgram:v1.0
             sudo docker compose stop
             sudo docker compose rm backend
             touch .env

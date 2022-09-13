@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default=' ')
 
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
-ALLOWED_HOSTS = ['51.250.97.70', 'localhost', '127.0.0.1', 'db']
+ALLOWED_HOSTS = ['84.252.143.248', 'localhost', '127.0.0.1']
 
 INGREDIENTS_LIST_FILENAME = 'to_buy.txt'
 

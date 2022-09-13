@@ -23,7 +23,7 @@ class MyUser(AbstractUser):
     )
     password = models.CharField(
         verbose_name='Пароль',
-        max_length=16,
+        max_length=100,
     )
 
     USERNAME_FIELD = 'email'

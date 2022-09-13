@@ -3,6 +3,8 @@ version: '3.3'
 services:
   db:
     image: postgres:12.4
+    environment:
+            POSTGRES_PASSWORD: postgres
     container_name: postgresql
     volumes:
       - postgres_data:/var/lib/postgresql/data/

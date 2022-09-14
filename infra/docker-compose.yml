@@ -13,7 +13,7 @@ services:
       - ./.env
 
   backend:
-    image: shanik92/foodgram:v2.4
+    image: shanik92/foodgram:v2.6
     restart: always
     depends_on:
       - db
@@ -24,7 +24,7 @@ services:
       - ./.env
 
   frontend:
-    image: shanik92/foodgram-frontend:v1.0
+    image: shanik92/foodgram-frontend:v2.1
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:

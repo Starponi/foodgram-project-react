@@ -13,7 +13,7 @@ services:
       - ./.env
 
   backend:
-    image: shanik92/foodgram-beckend:v3.2
+    image: shanik92/foodgram-beckend:v3.3
     restart: always
     depends_on:
       - db

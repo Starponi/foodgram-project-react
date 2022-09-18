@@ -77,7 +77,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Теги',
-        related_name='recipres',
+        related_name='recipes',
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления в минутах',
@@ -90,6 +90,10 @@ class Recipe(models.Model):
                 600, 'Слишком большое время приготовления!'
             ),
         ),
+    )
+    pud_date = models.DateTimeField(
+        auto_now_add=True, 
+        verbose_name='Дата публиуации',
     )
 
     class Meta:
@@ -111,12 +115,12 @@ class AmountIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
-        related_name='recipe',
+        # related_name='recipe',
         on_delete=models.CASCADE,
 
     )
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество ингредиентов',
+        verbose_name='Количество ингредиента',
         default=0,
         validators=(
             MinValueValidator(
@@ -170,13 +174,13 @@ class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='fovorited',
+        related_name='favorited_by',
         verbose_name='Рецепт',
     )
 
     class Meta:
         verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранные'
+        verbose_name_plural = 'Избранное'
         ordering = ('-id', )
         constraints = (
             models.UniqueConstraint(

@@ -44,7 +44,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
@@ -71,11 +71,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
-        if request.is_anonymous:
+        if not request or request.user.is_anonymous:
             return False
-        return ShoppingCart.objects.filter(recipe=obj,
-                                           user=request.user).exists()
-    
+        return Favorite.objects.filter(recipe=obj,
+                                       user=request.user).exists()
+
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
@@ -142,7 +142,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=author, **validated_data)
-        self.add_recipe_ingredients(ingredients_data, recipe)
+        self.__add_recipe_ingredients(ingredients_data, recipe)
         recipe.tags.set(tags_data)
         return recipe
 
@@ -155,7 +155,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         if 'ingredients' in self.initial_data:
             ingredients = validated_data.pop('ingredients')
             recipe.ingredients.clear()
-            self.add_recipe_ingredients(ingredients, recipe)
+            self.__add_recipe_ingredients(ingredients, recipe)
         if 'tags' in self.initial_data:
             tags_data = validated_data.pop('tags')
             recipe.tags.set(tags_data)

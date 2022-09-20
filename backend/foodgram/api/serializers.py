@@ -7,7 +7,8 @@ from rest_framework.serializers import ValidationError
 from recipes.models import (
     AmountIngredient, Favorite, Ingredient, Recipe, ShoppingCart, Tag
 )
-from users.serializers import CustomUserSerializer
+from backend.foodgram.users.serializers import CustomUserSerializer
+
 from .mixins import RecipeMixin
 
 User = get_user_model()

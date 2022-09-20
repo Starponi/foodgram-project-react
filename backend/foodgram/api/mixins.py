@@ -1,4 +1,5 @@
 from rest_framework.serializers import ValidationError
+from rest_framework import mixins, viewsets
 
 
 class RecipeMixin:
@@ -18,3 +19,10 @@ class RecipeMixin:
         request = self.context.get('request')
         context = {'request': request}
         return self.serializer_def(instance.recipe, context=context).data
+
+
+class RetriveAndListViewSet(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet):
+    pass

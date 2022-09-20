@@ -19,7 +19,7 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = ShowFollowSerializer
 
     @action(detail=True, permission_classes=[permissions.IsAuthenticated, ])
-    def get(self, request, id=None):
+    def get(self, request, id):
         data = {'user': request.user.id, 'following': id}
         serializer = FollowSerializer(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)

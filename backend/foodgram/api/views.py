@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .filters import IngredientsFilter, RecipeFilter
+from .mixins import RetriveAndListViewSet
 from .pagination import ResultsSetPagination
 from .permissions import IsAuthorOrAdmin
 from .serializers import (
@@ -16,7 +17,7 @@ from .serializers import (
 from .utils import download_file_response, get_ingredients_list
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+class IngredientViewSet(RetriveAndListViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngedientSerializer
     permission_classes = [permissions.AllowAny]
@@ -24,7 +25,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = IngredientsFilter
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
+class TagViewSet(RetriveAndListViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [permissions.AllowAny]

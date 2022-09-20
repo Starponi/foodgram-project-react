@@ -93,7 +93,7 @@ class Recipe(models.Model):
     )
     pud_date = models.DateTimeField(
         auto_now_add=True, 
-        verbose_name='Дата публиуации',
+        verbose_name='Дата публикации',
     )
 
     class Meta:
@@ -115,7 +115,6 @@ class AmountIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
-        # related_name='recipe',
         on_delete=models.CASCADE,
 
     )

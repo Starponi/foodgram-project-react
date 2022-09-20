@@ -38,7 +38,7 @@ class MyUser(AbstractUser):
 
 class Follow(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE,
-                             related_name='Подписчик',
+                             related_name='follower',
                              verbose_name='Подписчик')
     following = models.ForeignKey(MyUser, on_delete=models.CASCADE,
                                   related_name='following',

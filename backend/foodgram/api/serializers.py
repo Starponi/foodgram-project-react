@@ -122,7 +122,7 @@ class AddRecipeSerializer(serializers.ModelSerializer):
             raise ValidationError('Время готовки не может быть 0')
         return data
 
-    def __add_recipe_ingredients(ingredients, recipe):
+    def __add_recipe_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
             ingredient_id = ingredient['id']
             amount = ingredient['amount']

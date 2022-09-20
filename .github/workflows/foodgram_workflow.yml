@@ -47,7 +47,7 @@ jobs:
           push: true
           context: ./backend/foodgram/
           file: ./backend/foodgram/Dockerfile
-          tags: shanik92/foodgram-beckend:3.9
+          tags: shanik92/foodgram-beckend:4.1
       # - name: Push to Docker Hub
       #   uses: docker/build-push-action@v2
       #   with:

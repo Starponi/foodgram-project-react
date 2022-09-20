@@ -64,7 +64,8 @@ class ListFollowViewSet(generics.ListAPIView):
 #     @action(detail=True, permission_classes=[permissions.IsAuthenticated, ])
 #     def get(self, request, id):
 #         data = {'user': request.user.id, 'following': id}
-#         serializer = FollowSerializer(data=data, context={'request': request})
+#         serializer = FollowSerializer(
+# data=data, context={'request': request})
 #         serializer.is_valid(raise_exception=True)
 #         serializer.save()
 #         return Response(serializer.data, status=status.HTTP_201_CREATED)

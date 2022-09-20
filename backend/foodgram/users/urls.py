@@ -14,15 +14,6 @@ urlpatterns = [
     path('', include('djoser.urls')),
 ]
 
-
-
-
-
-
-
-
-
-
 # from django.urls import include, path
 # from djoser import views
 

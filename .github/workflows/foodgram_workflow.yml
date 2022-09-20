@@ -70,7 +70,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           stack_file_name: docker-compose.yml
           script: |
-            sudo docker pull shanik-92/foodgram-beckend:v3.9
+            sudo docker pull shanik-92/foodgram-beckend:v4.0
             sudo docker compose stop
             sudo docker compose rm backend
             touch .env

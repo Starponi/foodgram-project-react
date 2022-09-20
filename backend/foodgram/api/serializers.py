@@ -1,13 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.db.models import F
 from drf_extra_fields.fields import Base64ImageField
+from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from recipes.models import (
-    AmountIngredient, Favorite, Ingredient, Recipe, ShoppingCart, Tag
+    AmountIngredient, Favorite, Ingredient, Recipe, ShoppingCart, Tag, 
 )
-from users.serializers import CustomUserSerializer
+from users.models import Follow
+# from users.serializers import CustomUserSerializer
 
 from .mixins import RecipeMixin
 
@@ -42,6 +44,22 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AmountIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class CustomUserSerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
+    class Meta():
+        model = User
+        fields = ('id', 'email', 'username', 'first_name',
+                  'last_name', 'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return Follow.objects.filter(user=self.context['request'].user,
+                                     following=obj).exists()
 
 
 class RecipeSerializer(serializers.ModelSerializer):

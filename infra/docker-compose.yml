@@ -3,8 +3,6 @@ version: '3.3'
 services:
   db:
     image: postgres:12.4
-    environment:
-      - POSTGRES_PASSWORD=postgres
     container_name: postgresql
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -13,7 +11,7 @@ services:
       - ./.env
 
   backend:
-    image: shanik92/foodgram-beckend:v4.1
+    image: shanik92/foodgram-beckend:v4.9
     restart: always
     depends_on:
       - db

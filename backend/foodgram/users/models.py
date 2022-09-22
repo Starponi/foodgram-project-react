@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class MyUser(AbstractUser):
+class User(AbstractUser):
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
         max_length=100,
@@ -33,18 +33,18 @@ class MyUser(AbstractUser):
 
 
 class Follow(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE,
-                             related_name='follower',
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='user',
                              verbose_name='Подписчик')
-    following = models.ForeignKey(MyUser, on_delete=models.CASCADE,
-                                  related_name='following',
-                                  verbose_name='Автор подписки')
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name='following',
+                               verbose_name='Автор подписки')
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=['user', 'following'],
-                       name='unique_following')]
+        constraints = [models.UniqueConstraint(fields=['user', 'author'],
+                       name='unigue_subscriber')]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-    
-    def __str___(self):
-        return f'{self.user} {self.following}'
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.author}'

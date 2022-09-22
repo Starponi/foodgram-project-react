@@ -1,14 +1,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from . import views
+from .views import TagViewSet, IngredientViewSet, RecipeViewSet
 
 router = DefaultRouter()
 
-router.register('ingredients', views.IngredientViewSet,
+router.register('ingredients', IngredientViewSet,
                 basename='ingredients')
-router.register('tags', views.TagViewSet, basename='tags')
-router.register('recipes', views.RecipeViewSet, basename='recipes')
+router.register('tags', TagViewSet, basename='tags')
+router.register('recipes', RecipeViewSet, basename='recipes')
 
 
 urlpatterns = [

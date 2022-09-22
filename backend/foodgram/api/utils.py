@@ -1,30 +1,34 @@
-from django.db.models import Sum
 from django.http.response import HttpResponse
 
-from recipes.models import AmountIngredient
+from recipes.models import RecipeIngredient
 
 
 def get_ingredients_list(request):
-    ingredients = AmountIngredient.objects.filter(
-        recipe__carts__user=request.user.id).values(
+    ingredients_dict = {}
+    ingredients = RecipeIngredient.objects.values(
+        'amount',
         'ingredient__name',
         'ingredient__measurement_unit'
-    ).annotate(amount=Sum('amount'))
-    to_buy = []
-    for position, ingredient in enumerate(ingredients, start=1):
-        to_buy.append(
-            f'\n{position}. {ingredient["ingredient__name"]}:'
-            f' {ingredient["amount"]}'
-            f'({ingredient["ingredient__measurement_unit"]})'
-        )
-    response = HttpResponse(to_buy, content_type='text')
-    response['Content-Disposition'] = (
-        'attachment;filename=shopping_cart.pdf'
     )
-    return response
+    for ingredient in ingredients:
+        amount = ingredient['amount']
+        name = ingredient['ingredient__name']
+        measurement_unit = ingredient['ingredient__measurement_unit']
+        if name not in ingredients_dict:
+            ingredients_dict[name] = {
+                'measurement_unit': measurement_unit,
+                'amount': amount
+            }
+        else:
+            ingredients_dict[name]['amount'] += amount
+    to_buy = []
+    for item in ingredients_dict:
+        to_buy.append(f'{item} - {ingredients_dict[item]["amount"]} '
+                      f'{ingredients_dict[item]["measurement_unit"]} \n')
+    return to_buy
 
 
 def download_file_response(list_to_download, filename):
     response = HttpResponse(list_to_download, 'Content-Type: text/plain')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    return
+    return response

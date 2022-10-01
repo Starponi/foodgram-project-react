@@ -1,11 +1,14 @@
 # Foodgram - Продуктовый помощник
+## Проект будет доступен по ссылкам:
 
-## Описание проекта
-http://158.160.7.106/
+Приложение - hhttp://158.160.7.106/
+Пользователи: 
 admin - admin@admin.ru
 password - 12345678f
 user - qwerty@qwerty.ru
 password - 12345678f
+
+## Описание проекта
 
 Foodgram это ресурс для публикации рецептов.
 Пользователи могут создавать свои рецепты, читать рецепты других пользователей, подписываться на интересных авторов, добавлять лучшие рецепты в избранное, а также создавать список покупок и загружать его.
@@ -55,4 +58,9 @@ docker-compose exec backend python manage.py createsuperuser
 Соберите статику:
 ```bash
 docker-compose exec backend python manage.py collectstatic --noinput
+```
+```
+При первом запуске заполнить БД подготовленными данными:
+python manage.py load_ingrs
+python manage.py load_tags
 ```

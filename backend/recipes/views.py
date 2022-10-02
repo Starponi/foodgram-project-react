@@ -8,11 +8,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recipes.models import (
-    Favorite, Ingredient, Recipe, ShoppingList, Tag, RecipeIngredient,
+    Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingList, Tag,
 )
-from recipes.serializers import (TagsSerializer, IngredientsSerializer,
-                                 ShowRecipeFullSerializer, AddRecipeSerializer,
-                                 FavoriteSerializer, ShoppingListSerializer)
+from recipes.serializers import (
+    AddRecipeSerializer, FavoriteSerializer, IngredientsSerializer,
+    ShoppingListSerializer, ShowRecipeFullSerializer, TagsSerializer, 
+)
 from recipes.filters import IngredientsFilter, RecipeFilter
 from recipes.mixins import RetriveAndListViewSet
 from recipes.permissions import IsAuthorOrAdmin
@@ -50,8 +51,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return ShowRecipeFullSerializer
         return AddRecipeSerializer
-
-    def create_ingredients(self, ingredients, recipe):
+    
+    @staticmethod
+    def __create_ingredients(ingredients, recipe):
         for ingredient in ingredients:
             RecipeIngredient.objects.bulk_create([
                 RecipeIngredient(
@@ -66,14 +68,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         image = serializer.validated_data.pop('image')
         ingredients = serializer.validated_data.pop('ingredients')
         recipe = serializer.save(image=image, author=author)
-        self.create_ingredients(ingredients, recipe)
+        self.__create_ingredients(ingredients, recipe)
 
     def perform_update(self, serializer):
         data = serializer.validated_data
         ingredients = data.pop('ingredients')
         instance = serializer.save()
         instance.ingredients.clear()
-        self.create_ingredients(ingredients, instance)
+        self.__create_ingredients(ingredients, instance)
 
     @action(
         detail=True,

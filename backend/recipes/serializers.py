@@ -6,7 +6,6 @@ from .models import (
     Tag, Ingredient, Recipe, RecipeIngredient, Favorite, ShoppingList
 )
 from users.serializers import CustomUserSerializer
-
 from .mixins import RecipeMixin
 
 User = get_user_model()
